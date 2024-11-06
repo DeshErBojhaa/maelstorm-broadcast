@@ -21,10 +21,9 @@ type Message struct {
 func main() {
 	n := maelstrom.NewNode()
 	graph := make(map[string][]string)
-	var (
-		values []int
-		mu     sync.Mutex
-	)
+	values := make(map[int]struct{})
+	failed := make(map[int]struct{})
+	mu := sync.Mutex{}
 
 	n.Handle("broadcast", func(msg maelstrom.Message) error {
 		var body Message
@@ -33,10 +32,10 @@ func main() {
 		}
 		val := body.Message
 		mu.Lock()
-		if slices.Contains(values, val) {
+		if _, ok := values[val]; ok {
 			return nil
 		}
-		values = append(values, val)
+		values[val] = struct{}{}
 		mu.Unlock()
 		for _, nxt := range graph[n.ID()] {
 			if nxt == n.ID() {
@@ -45,6 +44,7 @@ func main() {
 			if err := n.RPC(nxt, body, func(_ maelstrom.Message) error {
 				return nil
 			}); err != nil {
+				failed[val] = struct{}{}
 				return err
 			}
 		}
@@ -61,9 +61,14 @@ func main() {
 	})
 
 	n.Handle("read", func(msg maelstrom.Message) error {
+		val := make([]int, 0, len(values))
+		for v := range values {
+			val = append(val, v)
+		}
+		slices.Sort(val)
 		return n.Reply(msg, map[string]any{
 			"type":     "read_ok",
-			"messages": values,
+			"messages": val,
 		})
 	})
 

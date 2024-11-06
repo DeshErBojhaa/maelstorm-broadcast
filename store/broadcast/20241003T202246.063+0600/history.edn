@@ -1,0 +1,26 @@
+{:index 0, :time 14899584, :type :info, :process :nemesis, :f :start-partition, :value :one}
+{:index 1, :time 16851750, :type :invoke, :process 0, :f :read, :value nil}
+{:index 2, :time 18669000, :type :info, :process :nemesis, :f :start-partition, :value [:isolated {"n0" #{}}]}
+{:index 3, :time 19796667, :type :ok, :process 0, :f :read, :value nil}
+{:index 4, :time 121379125, :type :invoke, :process 0, :f :read, :value nil}
+{:index 5, :time 122683834, :type :ok, :process 0, :f :read, :value nil}
+{:index 6, :time 171321917, :type :invoke, :process 0, :f :read, :value nil}
+{:index 7, :time 172278667, :type :ok, :process 0, :f :read, :value nil}
+{:index 8, :time 360831625, :type :invoke, :process 0, :f :broadcast, :value 0}
+{:index 9, :time 4720114000, :type :info, :process :nemesis, :f :stop-partition, :value nil}
+{:index 10, :time 4720815042, :type :info, :process :nemesis, :f :stop-partition, :value :network-healed}
+{:index 11, :time 5372173792, :type :info, :process 0, :f :broadcast, :value 0, :error :net-timeout}
+{:index 12, :time 5372273292, :type :invoke, :process 1, :f :broadcast, :value 1}
+{:index 13, :time 5857222500, :type :info, :process :nemesis, :f :start-partition, :value :majorities-ring}
+{:index 14, :time 5859173917, :type :info, :process :nemesis, :f :start-partition, :value [:isolated {"n0" #{}}]}
+{:index 15, :time 10376968834, :type :info, :process 1, :f :broadcast, :value 1, :error :net-timeout}
+{:index 16, :time 10377056875, :type :invoke, :process 2, :f :broadcast, :value 2}
+{:index 17, :time 11535234542, :type :info, :process :nemesis, :f :stop-partition, :value nil}
+{:index 18, :time 11535785709, :type :info, :process :nemesis, :f :stop-partition, :value :network-healed}
+{:index 19, :time 15377452459, :type :info, :process 2, :f :broadcast, :value 2, :error :net-timeout}
+{:index 20, :time 15377532875, :type :invoke, :process 3, :f :broadcast, :value 3}
+{:index 21, :time 20382653709, :type :info, :process 3, :f :broadcast, :value 3, :error :net-timeout}
+{:index 22, :time 20382728625, :type :info, :process :nemesis, :f :stop-partition, :value nil}
+{:index 23, :time 20383262334, :type :info, :process :nemesis, :f :stop-partition, :value :network-healed}
+{:index 24, :time 30388725375, :type :invoke, :process 4, :f :read, :value nil, :final? true}
+{:index 25, :time 35395516500, :type :fail, :process 4, :f :read, :value nil, :final? true, :error :net-timeout}

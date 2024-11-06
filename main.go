@@ -23,7 +23,6 @@ func main() {
 	n := maelstrom.NewNode()
 	graph := make(map[string][]string)
 	values := make(map[int]struct{})
-	failed := make(map[int]struct{})
 	mu := sync.RWMutex{}
 
 	go func() {
@@ -32,7 +31,13 @@ func main() {
 		for {
 			select {
 			case <-tk.C:
-				for v := range failed {
+				retry := make([]int, 0, len(values))
+				mu.RLock()
+				for v := range values {
+					retry = append(retry, v)
+				}
+				mu.RUnlock()
+				for v := range retry {
 					for _, nxt := range graph[n.ID()] {
 						if nxt == n.ID() {
 							continue
@@ -53,11 +58,14 @@ func main() {
 		}
 		val := body.Message
 		mu.Lock()
-		if _, ok := values[val]; ok {
+		_, ok := values[val]
+		if !ok {
+			values[val] = struct{}{}
+		}
+		mu.Unlock()
+		if ok {
 			return nil
 		}
-		values[val] = struct{}{}
-		mu.Unlock()
 		for _, nxt := range graph[n.ID()] {
 			if nxt == n.ID() {
 				continue
@@ -65,7 +73,6 @@ func main() {
 			if err := n.RPC(nxt, body, func(_ maelstrom.Message) error {
 				return nil
 			}); err != nil {
-				failed[val] = struct{}{}
 				return err
 			}
 		}

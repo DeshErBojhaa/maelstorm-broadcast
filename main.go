@@ -6,6 +6,7 @@ import (
 	"log"
 	"slices"
 	"sync"
+	"time"
 )
 
 type Topo struct {
@@ -24,6 +25,26 @@ func main() {
 	values := make(map[int]struct{})
 	failed := make(map[int]struct{})
 	mu := sync.RWMutex{}
+
+	go func() {
+		tk := time.NewTicker(time.Second)
+		defer tk.Stop()
+		for {
+			select {
+			case <-tk.C:
+				for v := range failed {
+					for _, nxt := range graph[n.ID()] {
+						if nxt == n.ID() {
+							continue
+						}
+						_ = n.RPC(nxt, Message{Type: "broadcast", Message: v}, func(_ maelstrom.Message) error {
+							return nil
+						})
+					}
+				}
+			}
+		}
+	}()
 
 	n.Handle("broadcast", func(msg maelstrom.Message) error {
 		var body Message

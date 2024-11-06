@@ -1,3 +1,11 @@
 /store/
 /.idea/
 /bin/
+
+/bin/main
+/store/broadcast/latest/
+/store/current/
+/store/latest/
+/.gitignore
+/broadcase.iml
+/Makefile

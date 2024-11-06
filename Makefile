@@ -9,3 +9,6 @@ multi: build
 
 partition: build
 	../ms/maelstrom test -w broadcast --bin ./bin/main --node-count 5 --time-limit 20 --rate 10 --nemesis partition
+
+performance: build
+	../ms/maelstrom test -w broadcast --bin ./bin/main --node-count 25 --time-limit 20 --rate 100 --latency 100

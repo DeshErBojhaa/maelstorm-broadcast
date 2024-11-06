@@ -23,7 +23,7 @@ func main() {
 	graph := make(map[string][]string)
 	values := make(map[int]struct{})
 	failed := make(map[int]struct{})
-	mu := sync.Mutex{}
+	mu := sync.RWMutex{}
 
 	n.Handle("broadcast", func(msg maelstrom.Message) error {
 		var body Message
@@ -62,9 +62,11 @@ func main() {
 
 	n.Handle("read", func(msg maelstrom.Message) error {
 		val := make([]int, 0, len(values))
+		mu.RLock()
 		for v := range values {
 			val = append(val, v)
 		}
+		mu.RUnlock()
 		slices.Sort(val)
 		return n.Reply(msg, map[string]any{
 			"type":     "read_ok",

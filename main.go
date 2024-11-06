@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	maelstrom "github.com/jepsen-io/maelstrom/demo/go"
 	"log"
+	"slices"
+	"sync"
 )
 
 type Topo struct {
@@ -11,20 +13,38 @@ type Topo struct {
 	Topology map[string][]string `json:"topology"`
 }
 
+type Message struct {
+	Type    string `json:"type"`
+	Message int    `json:"message"`
+}
+
 func main() {
 	n := maelstrom.NewNode()
 	graph := make(map[string][]string)
-	var values []int
+	var (
+		values []int
+		mu     sync.Mutex
+	)
 
 	n.Handle("broadcast", func(msg maelstrom.Message) error {
-		var body map[string]any
+		var body Message
 		if err := json.Unmarshal(msg.Body, &body); err != nil {
 			return err
 		}
-		val := int(body["message"].(float64))
+		val := body.Message
+		mu.Lock()
+		if slices.Contains(values, val) {
+			return nil
+		}
 		values = append(values, val)
+		mu.Unlock()
 		for _, nxt := range graph[n.ID()] {
-			if err := n.Send(nxt, val); err != nil {
+			if nxt == n.ID() {
+				continue
+			}
+			if err := n.RPC(nxt, body, func(_ maelstrom.Message) error {
+				return nil
+			}); err != nil {
 				return err
 			}
 		}
